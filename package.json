@@ -1,0 +1,23 @@
+{
+  "name": "cswap-nft",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/fchua/cswap-nft.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/fchua/cswap-nft/issues"
+  },
+  "homepage": "https://github.com/fchua/cswap-nft#readme",
+  "dependencies": {
+    "@blockfrost/blockfrost-js": "^4.1.0",
+    "amqplib": "^0.10.0"
+  }
+}
