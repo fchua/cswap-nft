@@ -11,8 +11,10 @@ console.log("policy", policyKey);
 console.log("public", publicKey1);
 
 const headers = {
-    "project_id": "mainnetj5LbyeKdRfm7wy4NW1XLUWHPa2WP9Kzn"
+    project_id: "mainnetj5LbyeKdRfm7wy4NW1XLUWHPa2WP9Kzn"
 }
+
+const walletAddr = "addr1vxdnhre2kxhh3n63lgjg2qttq79gwkwzj9chxwaarfr8qus9sgg7w";
 
 const mintNft = async (
   privateKey,
@@ -26,12 +28,6 @@ const mintNft = async (
 
   const publicKey = privateKey.to_public();
 
-  const addr = CardanoWasm.BaseAddress.new(
-    CardanoWasm.NetworkInfo.mainnet().network_id(),
-    CardanoWasm.StakeCredential.from_keyhash(publicKey.hash()),
-    CardanoWasm.StakeCredential.from_keyhash(publicKey.hash())
-  ).to_address();
-
   const policyPubKey = policy.privateKey.to_public();
 
   const policyAddr = CardanoWasm.BaseAddress.new(
@@ -40,18 +36,19 @@ const mintNft = async (
     CardanoWasm.StakeCredential.from_keyhash(policyPubKey.hash())
   ).to_address();
 
-  console.log(`ADDR: ${addr.to_bech32()}`);
+  console.log(`ADDR: ${walletAddr}`);
 
   // get utxos for our address and select one that is probably big enough to pay the tx fee
-  const utxoRes = await axios.get("https://cardano-mainnet.blockfrost.io/api/v0/addresses/" + addr.to_bech32 + "/utxos", headers);
+  const utxoRes = await axios.get("https://cardano-mainnet.blockfrost.io/api/v0/addresses/" + walletAddr + "/utxos", { headers : headers });
 
   let utxo = null;
 
   if (utxoRes.data) {
     for (const utxoEntry of utxoRes.data) {
-      for (const utxoAmount of utxoRes.amount) {
-        if (utxoEntry.unit == "lovelace" && utxoEntry.quantity > FEE) {
+      for (const utxoAmount of utxoEntry.amount) {
+        if (utxoAmount.unit == "lovelace" && utxoAmount.quantity > FEE) {
             utxo = utxoEntry;
+            console.log("UTXO: " + utxoEntry);
         }
       }
     }
@@ -64,7 +61,7 @@ const mintNft = async (
   console.log(`UTXO: ${JSON.stringify(utxo, null, 4)}`);
 
   // get current global slot from yoroi backend
-  const { data: slotData } = await axios.get("https://cardano-mainnet.blockfrost.io/api/v0/blocks/latest", headers);
+  const { data: slotData } = await axios.get("https://cardano-mainnet.blockfrost.io/api/v0/blocks/latest", { headers : headers });
   console.log('slotData', slotData);
 
   const ttl = slotData.slot + 60 * 60 * 2;  // two hours from now
@@ -213,7 +210,6 @@ try {
   const publicKey = CardanoWasm.PublicKey.from_bytes(cbor.decodeFirstSync(publicKey1.cborHex));
   console.log(`PRIVATE KEY: ${privateKey.to_bech32()}`);
   console.log(`PUBLIC KEY A: ${publicKey.to_bech32()}`);
-  console.log(`PUBLIC KEY B: ${privateKey.to_public().to_bech32()}`);
 
   // import policy key from a .skey file
   const policyPrivateKey = CardanoWasm.PrivateKey.from_normal_bytes(cbor.decodeFirstSync(policyKey.cborHex));
