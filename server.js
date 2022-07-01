@@ -1,82 +1,37 @@
-const Blockfrost = require('@blockfrost/blockfrost-js');
-const fs = require('node:fs/promises');
-const amqplib = require('amqplib');
+import * as fs from 'fs';
+import cmd from 'node-cmd';
 
-const API = new Blockfrost.BlockFrostAPI({
-  projectId: 'testnetZSXv3ENISObi2NkCLJnc1wcmQFOmEXJ0',
-});
+const CARDANO_CLI_PATH = "cardano-cli";
+const CARDANO_KEYS_DIR = "/cardano/frank-nft/keys";
+const TOTAL_EXPECTED_LOVELACE = 2500000;
 
-const depositAddr = 'addr_test1qpkx7u9ky4e44v7d2nsh4d2c47c5n7fq5pf7zlezajcc9gdreal5amympzhpp2ckuysn85vmggmctlfk6tcz6pc6s0lq4tztrf';
+const walletAddress = fs.readFileSync(`${CARDANO_KEYS_DIR}/payment.addr`).toString();
 
-const configFile = 'config.json';
+const rawUtxoTable = cmd.runSync([
+	CARDANO_CLI_PATH,
+	"query", "utxo",
+	"--mainnet",
+	"--address", walletAddress
+].join(" "));
 
-var conn;
-var channel;
+console.log('rawUtxoTable',rawUtxoTable);
 
-async function initializeQueues() {
-    conn = await amqplib.connect('amqp://localhost:49154');
-    console.log('Creating channel for sending');
-    channel = await conn.createChannel();
+const utxoTableRows = rawUtxoTable.data.trim().split('\n');
+let totalLovelaceRecv = 0;
+let isPaymentComplete = false;
+
+console.log('utxoTableRows',utxoTableRows);
+
+for (let x = 2; x < utxoTableRows.length; x++) {
+	const cells = utxoTableRows[x].split(" ").filter(i => i);
+	console.log('cells',cells);
+	totalLovelaceRecv += parseInt(cells[2]);
 }
 
-async function runWalletProcessing() {
-  try {
-    console.log('Reading from config file...');
-    const contents = await fs.readFile(configFile, "utf-8");
-    const config = JSON.parse(contents);
+isPaymentComplete = totalLovelaceRecv >= TOTAL_EXPECTED_LOVELACE;
 
-    const latestBlock = await API.blocksLatest();
-    const address = await API.addresses(
-      'addr_test1qpkx7u9ky4e44v7d2nsh4d2c47c5n7fq5pf7zlezajcc9gdreal5amympzhpp2ckuysn85vmggmctlfk6tcz6pc6s0lq4tztrf',
-    );
-    const transactions = await API.addressesTransactionsAll(depositAddr);
+console.log(`Total Received: ${totalLovelaceRecv} LOVELACE`);
+console.log(`Expected Payment: ${TOTAL_EXPECTED_LOVELACE} LOVELACE`);
+console.log(`Payment Complete: ${(isPaymentComplete ? "✅" : "❌")}`);
 
-    console.log('address', address);
-    console.log('latestBlock', latestBlock);
-    console.log('transactions', transactions);
 
-    for (let tx of transactions) {
-        console.log('tx', tx);
-        const utxos = await API.txsUtxos(tx.tx_hash);
-        console.log('utxos', utxos);
-
-        for (let output of utxos.outputs) {
-            console.log('output', output);
-        }
-    }
-
-    console.log('Writing to config file...');
-    const result = await fs.writeFile(configFile, JSON.stringify({ latestBlock : latestBlock.height }), "utf-8");
-    console.log('Config file updated.');
-
-    console.log('Sending mint task to queue');
-    channel.sendToQueue('pending-mint', Buffer.from(JSON.stringify({ address : '1234', tokens: 12345, deposit : 2000})));
-
-    console.log('Closing connection');
-    conn.close();
-} catch (err) {
-    console.log('error', err);
-  }
-}
-
-initializeQueues();
-runWalletProcessing();
-
-// we need to identify the source wallet
-// there could be more than 1 wallet address
-// { addresses : [ 'addr_test1qpkx7u9ky4e44v7d2nsh4d2c47c5n7fq5pf7zlezajcc9gdreal5amympzhpp2ckuysn85vmggmctlfk6tcz6pc6s0lq4tztrf' ], amount }
-
-// if we have multiple input address which one is the main address?
-// we need to keep track of all the payments
-
-// input address
-
-// create a minting task
-function queueForMinting() {
-
-}
-
-// create a delivery task
-function queueForDelivery() {
-
-}
