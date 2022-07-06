@@ -1,0 +1,35 @@
+{
+    "721": 
+    {
+        "79f1701c92ec164c42c8f5580c06dc576ff233e2bc5ea3f8e20f5aaa": 
+        {
+            "CswapNft001": 
+            {
+                "description": "Hercules",
+                "name": "CSwap NFT Collection",
+                "id": "1",
+                "image": "ipfs://QmTzoBZYdSvGFjocp6bvAV6b7coXE6BvdDNBHG9nT3BKap",
+                "tokens": "1000000",
+                "rarity": "Platinum"
+            },
+            "CswapNft002": 
+            {
+                "description": "Hercules",
+                "name": "CSwap NFT Collection",
+                "id": "1",
+                "image": "ipfs://QmTzoBZYdSvGFjocp6bvAV6b7coXE6BvdDNBHG9nT3BKap",
+                "tokens": "1000000",
+                "rarity": "Gold"
+            },
+            "CswapNft003": 
+            {
+                "description": "Hercules",
+                "name": "CSwap NFT Collection",
+                "id": "1",
+                "image": "ipfs://QmTzoBZYdSvGFjocp6bvAV6b7coXE6BvdDNBHG9nT3BKap",
+                "tokens": "1000000",
+                "rarity": "Silver"
+            }          
+        }
+    }
+}
