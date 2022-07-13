@@ -1,0 +1,26 @@
+{
+	"CSWAPNFT0049": {
+		"name": "CSWAPNFT0049",
+		"description": "CSWAP NFT Collection",
+		"id": 49,
+		"image": "ipfs://something",
+		"tokens": 359174.4212165608,
+		"rarity": "Common"
+	},
+	"CSWAPNFT0050": {
+		"name": "CSWAPNFT0050",
+		"description": "CSWAP NFT Collection",
+		"id": 50,
+		"image": "ipfs://something",
+		"tokens": 776845.20277209,
+		"rarity": "Common"
+	},
+	"CSWAPNFT0051": {
+		"name": "CSWAPNFT0051",
+		"description": "CSWAP NFT Collection",
+		"id": 51,
+		"image": "ipfs://something",
+		"tokens": 379078.59167193616,
+		"rarity": "Common"
+	}
+}

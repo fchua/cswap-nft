@@ -1,5 +1,5 @@
-import { CoinSelectionStrategyCIP2 } from '@emurgo/cardano-serialization-lib-nodejs';
 import { readdir, readFile, writeFile } from 'node:fs/promises';
+import date from 'date-and-time';
 
 const paymentsDir = 'output-payments';
 const metadataConfig = 'config-metadata.json';
@@ -18,7 +18,7 @@ async function handlePayments(paymentsList) {
         seqNo++;
         
         const name = assetName + seqNo.toString().padStart(4, "0");
-        const tokens = Math.random() * 10000000;
+        const tokens = payment.tokens;
         
         console.log('name', name);
         console.log('tokens', tokens);
@@ -27,7 +27,9 @@ async function handlePayments(paymentsList) {
     }
     
     console.log('assets', assets);
-
+    const now = new Date();
+    const filename = date.format(now, 'YYYYMMDDHHmmss') + '.json';
+    await writeFile('./output-metadata/' + filename, JSON.stringify(assets, null, '\t'));
     await saveLastSequenceNo(seqNo);
 }
 

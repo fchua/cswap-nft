@@ -1,52 +1,16 @@
-import * as fs from 'fs';
-import cmd from 'node-cmd';
 import * as Blockfrost from '@blockfrost/blockfrost-js';
 import { writeFile } from 'node:fs/promises';
 import date from 'date-and-time';
+import { randomUUID } from 'node:crypto';
 
 const API = new Blockfrost.BlockFrostAPI({
 	projectId: 'mainnetj5LbyeKdRfm7wy4NW1XLUWHPa2WP9Kzn', // see: https://blockfrost.io
   });
 
+// TODO change this to the official wallet address
 const walletAddress = 'addr1vxdnhre2kxhh3n63lgjg2qttq79gwkwzj9chxwaarfr8qus9sgg7w';
-var stakeAddress = '';
 
-const CARDANO_CLI_PATH = "cardano-cli";
-const CARDANO_KEYS_DIR = "/cardano/frank-nft/keys";
-const TOTAL_EXPECTED_LOVELACE = 2500000;
-
-/*
-const walletAddress = fs.readFileSync(`${CARDANO_KEYS_DIR}/payment.addr`).toString();
-
-const rawUtxoTable = cmd.runSync([
-	CARDANO_CLI_PATH,
-	"query", "utxo",
-	"--mainnet",
-	"--address", walletAddress
-].join(" "));
-
-console.log('rawUtxoTable',rawUtxoTable);
-
-const utxoTableRows = rawUtxoTable.data.trim().split('\n');
-let totalLovelaceRecv = 0;
-let isPaymentComplete = false;
-
-console.log('utxoTableRows',utxoTableRows);
-
-for (let x = 2; x < utxoTableRows.length; x++) {
-	const cells = utxoTableRows[x].split(" ").filter(i => i);
-	console.log('cells',cells);
-	totalLovelaceRecv += parseInt(cells[2]);
-}
-
-isPaymentComplete = totalLovelaceRecv >= TOTAL_EXPECTED_LOVELACE;
-
-console.log(`Total Received: ${totalLovelaceRecv} LOVELACE`);
-console.log(`Expected Payment: ${TOTAL_EXPECTED_LOVELACE} LOVELACE`);
-console.log(`Payment Complete: ${(isPaymentComplete ? "✅" : "❌")}`);
-*/
-
-async function runMint() {
+async function processPayments() {
 	try {
 		// extract the UTXOs
 		// assumptions:
@@ -65,7 +29,7 @@ async function runMint() {
 			const txHash = utxos[i].tx_hash;
 			const outputIdx = utxos[i].output_index;
 
-			const details = await API.txsUtxos(utxos[i].tx_hash);
+			const details = await API.txsUtxos(txHash);
 			const inputs = details.inputs;
 			var isTeamWallet = false;
 			for (let x = 0; x < inputs.length; x++) {
@@ -93,11 +57,22 @@ async function runMint() {
 				}
 			}
 
+			// pull metadata so we can validate the user wallet
+			const metadata = await API.txsMetadata(txHash);
+			console.log('metadata', metadata);
+			// TODO call GraphQL API to validate user wallet and get no. of tokens
+
+			const address = await API.addresses(userWallet);
+			console.log('address', address);
+
 			const data = {
 				user_wallet : userWallet,
 				tx_hash : txHash,
 				output_index : outputIdx,
-				lovelace : lovelace
+				lovelace : lovelace,
+				tokens: Math.random() * 1000000,
+				stake_address: address.stake_address,
+				user_id: randomUUID()
 			};
 
 			results.push(data);
@@ -112,4 +87,4 @@ async function runMint() {
 	}
 }
 
-runMint();
+processPayments();
