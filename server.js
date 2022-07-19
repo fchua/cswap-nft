@@ -6,7 +6,7 @@ import date from 'date-and-time';
 
 const API = new Blockfrost.BlockFrostAPI({
 	projectId: 'mainnetj5LbyeKdRfm7wy4NW1XLUWHPa2WP9Kzn', // see: https://blockfrost.io
-  });
+});
 
 const walletAddress = 'addr1vxdnhre2kxhh3n63lgjg2qttq79gwkwzj9chxwaarfr8qus9sgg7w';
 var stakeAddress = '';
