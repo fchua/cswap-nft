@@ -1,10 +1,12 @@
-import { readdir, readFile, writeFile } from 'node:fs/promises';
+import { readdir, readFile, writeFile, rename } from 'node:fs/promises';
 import date from 'date-and-time';
 
 const paymentsDir = 'output-payments';
-const metadataConfig = 'config-metadata.json';
+const metadataConfig = 'state/metadata.json';
+const ouputDir = 'output-metadata';
+const doneDir = 'done-payments';
 
-async function handlePayments(paymentsList) {
+async function processPayments(payments) {
     var seqNo = await loadLastSequenceNo();
 
     var assets = { };
@@ -12,10 +14,10 @@ async function handlePayments(paymentsList) {
     const assetName = await loadAssetName();
     const desc = await loadDescription();
 
-    for (const payment of paymentsList) {
+    for (const payment of payments) {
         console.log('payment', payment);
     
-        seqNo++;
+        seqNo++; // increment sequence
         
         const name = assetName + seqNo.toString().padStart(4, "0");
         const tokens = payment.tokens;
@@ -27,9 +29,8 @@ async function handlePayments(paymentsList) {
     }
     
     console.log('assets', assets);
-    const now = new Date();
-    const filename = date.format(now, 'YYYYMMDDHHmmss') + '.json';
-    await writeFile('./output-metadata/' + filename, JSON.stringify(assets, null, '\t'));
+    const filename = date.format(new Date(), 'YYYYMMDDHHmmss') + '.json';
+    await writeFile(ouputDir + '/' + filename, JSON.stringify(assets, null, '\t'));
     await saveLastSequenceNo(seqNo);
 }
 
@@ -74,7 +75,8 @@ function createSingleMetadata(desc, name, id, imageUrl, tokens, rarity) {
     return obj;
 }
 
-async function runMetadata() {
+// read files inside output-payments and generate the necessary metadata file
+async function generateMetadata() {
     try {
         const files = await readdir(paymentsDir);
         if (files.length == 0) {
@@ -83,16 +85,17 @@ async function runMetadata() {
         }
 
         for (const file of files) {
-            console.log('file', file);
-            var contents = await readFile(paymentsDir + '/' + file, 'utf-8');
-            //console.log('contents', contents);
-            var objects = JSON.parse(contents);
-            //console.log('objects', objects);
-            await handlePayments(objects);
+            if (file.endsWith('.json')) {
+                console.log('Processing file', file);
+                var contents = await readFile(paymentsDir + '/' + file, 'utf-8');
+                var objects = JSON.parse(contents);
+                await processPayments(objects);
+                await rename(paymentsDir + '/' + file, doneDir + '/' + file); // move processed files
+            }
         }
     } catch (err) {
-        console.log('error', err);
+        console.error('error', err);
     }
 }
 
-runMetadata();
+generateMetadata();
