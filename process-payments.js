@@ -2,13 +2,17 @@ import * as Blockfrost from '@blockfrost/blockfrost-js';
 import { writeFile, readFile } from 'node:fs/promises';
 import date from 'date-and-time';
 import { randomUUID } from 'node:crypto';
+import config from './config/config-mainnet.json' assert {type: 'json'};
+
+console.log('projectId', config.projectId);
+console.log('paymentAddress', config.paymentAddress);
 
 const API = new Blockfrost.BlockFrostAPI({
-	projectId: 'mainnetj5LbyeKdRfm7wy4NW1XLUWHPa2WP9Kzn', // see: https://blockfrost.io
+	projectId: config.projectId
 });
 
 // TODO change this to the official wallet address
-const teamWalletAddr = 'addr1vxdnhre2kxhh3n63lgjg2qttq79gwkwzj9chxwaarfr8qus9sgg7w';
+const teamWalletAddr = config.paymentAddress;
 
 const walletDatabase = 'state/wallets.json';
 
