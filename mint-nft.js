@@ -4,13 +4,13 @@ import cmd from 'node-cmd';
 
 const txHash = "fac7d76bc7fea7ccc7285c6765b77b0af0510af75e5f3dbc91d2d4cb2ca836e0";
 const txIx = "0";
-const targetAddr = "addr1q9y5a8ea64dz7p28hxzdwq7fltrghgant84j6gw3asam5hvx23v86j6cdz5fps95xxxhdtdprd45sfx0ta6sa4ykmsvslwmz69";
+const targetAddr = "addr_test1qpy5a8ea64dz7p28hxzdwq7fltrghgant84j6gw3asam5hvx23v86j6cdz5fps95xxxhdtdprd45sfx0ta6sa4ykmsvsucxzk6";
 
 const targetOutput = "1400000"; // lovelace
 const tokenAmount = 1; // NFT
 const tokenName = "";
 const policyId = "21df6057e2e7b73fb07caebd544c532e55ebabd845180e5de209f714";
-const changeAddr = "addr1q9kh78a7eeuhlywaadnu872mwm248c9lqqj9f6mz20htggrfy0n7d5pjvfkjh32q9tr3m4nmnfxnuhqwadxy0uwe9cdqm6xdj6";
+const changeAddr = "addr_test1vpkh78a7eeuhlywaadnu872mwm248c9lqqj9f6mz20htggq56wqm7";
 const script = "policy.script";
 const outFile = "matx.raw";
 
@@ -18,7 +18,7 @@ const tokenNameHex = Buffer.from(tokenName).toString('hex');
 
 const buildResult = cmd.runSync([
 	CARDANO_CLI_PATH,
-	"transaction", "build", "--mainnet", "--alonzo-era", 
+	"transaction", "build", "--testnet-magic", "1097911063", "--alonzo-era", 
     "--tx-in", `${txHash}#${txIx}`,
     "--tx-out", `${targetAddr}+${targetOutput}+"${tokenAmount} ${policyId}.${tokenNameHex}"`,
     "--change-address", `${changeAddr}`,
