@@ -170,7 +170,9 @@ async function processPayments() {
     state.lastId = id;
     console.log('state =', state);
 
-    await saveState();    
+    await saveState();
+
+    console.log('Complete');
 }
 
 function getConfig(name, projectId, paymentAddr) {
@@ -273,4 +275,4 @@ async function getUtxos() {
 
 processPayments();
 
-//setInterval(processPayments, interval);
+setInterval(processPayments, interval);
