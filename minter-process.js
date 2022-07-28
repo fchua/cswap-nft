@@ -41,7 +41,7 @@ function getFilenameFromId(id) {
 
 async function generateMetadata(id, tokens) {
     console.log('Creating metadata');
-    const assetName = `Asset #${id}`;
+    const assetName = `${config.assetName} #${id}`;
     const metadata = {
         "721" : {
             [state.policyId] : {
@@ -181,7 +181,8 @@ function getConfig(name, projectId, paymentAddr) {
         projectId: projectId,
         paymentAddr: paymentAddr,
         changeAddr: paymentAddr,
-        mintFee: 2500000
+        mintFee: 2500000,
+        assetName: "CSWAP NFT"
     };
 }
 
