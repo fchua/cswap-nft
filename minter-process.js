@@ -156,6 +156,12 @@ async function processPayments() {
                 id--; // minting failed, rollback
                 throw signResult.err;
             }
+
+            const submitResult = submitTx(id);
+            if (submitResult.err) {
+                id--; // minting failed, rollback
+                throw submitResult.err;
+            }
         }
     } catch (err) {
         console.error(err);
