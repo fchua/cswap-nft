@@ -1,0 +1,14 @@
+{
+	"721": {
+		"21df6057e2e7b73fb07caebd544c532e55ebabd845180e5de209f714": {
+			"Asset #1": {
+				"name": "Asset #1",
+				"id": 1,
+				"image": "ipfs://QmRhTTbUrPYEw3mJGGhQqQST9k86v1DPBiTTWJGKDJsVFw",
+				"cswapTokens": "1000000",
+				"rarity": "Common",
+				"background": "White"
+			}
+		}
+	}
+}
