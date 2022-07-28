@@ -2,7 +2,7 @@ import * as Blockfrost from '@blockfrost/blockfrost-js';
 import { readFile, writeFile } from 'node:fs/promises';
 import cmd from 'node-cmd';
 
-const CARDANO_CLI="/home/franklin/cardano-node/cardano-cli"
+const CARDANO_CLI="/cardano/cardano-node/cardano-cli"
 
 const interval = 5 * 60 * 1000;
 const mode = process.argv[2];
