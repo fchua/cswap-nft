@@ -74,7 +74,7 @@ function buildTx(txHash, txIx, targetAddr, id) {
 
     const command = [
         CARDANO_CLI,
-        "transaction", "build", "--testnet-magic", "1097911063", "--alonzo-era", 
+        "transaction", "build", "--testnet-magic", "1097911063", "--babbage-era", 
         "--tx-in", `${txHash}#${txIx}`,
         "--tx-out", `${targetAddr}+${state.targetOutput}+"1 ${policyId}.${assetNameHex}"`,
         "--change-address", config.paymentAddr,
