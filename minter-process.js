@@ -81,6 +81,7 @@ function buildTx(txHash, txIx, targetAddr, id) {
         "--mint", `"1 ${policyId}.${assetNameHex}"`,
         "--minting-script-file", policyScript,
         "--metadata-json-file", metadata,
+        "--invalid-hereafter", state.slotNumber,
         "--witness-override", "2",
         "--out-file", outFile
     ].join(" ");
@@ -99,7 +100,7 @@ function signTx(id) {
 
     const command = [
         CARDANO_CLI,
-        "transaction", "sign", "--testnet-magic", "1097911063", "--babbage-era", 
+        "transaction", "sign", "--testnet-magic", "1097911063",
         "--signing-key-file", "../cswap-keys/payment.skey",
         "--signing-key-file", "../cswap-keys/policy.skey",
         "--tx-body-file", bodyFile,
@@ -111,6 +112,23 @@ function signTx(id) {
     const signResult = cmd.runSync(command);
     console.log('signResult', signResult);
     return signResult;
+}
+
+function submitTx(id) {
+    const filename = getFilenameFromId(id);
+    const txFile = `txs/${filename}.signed`;
+
+    const command = [
+        CARDANO_CLI,
+        "transaction", "submit", "--testnet-magic", "1097911063",
+        "--tx-file", txFile
+    ].join(" ");
+
+    console.log('command', command);
+
+    const submitResult = cmd.runSync(command);
+    console.log('submitResult', submitResult);
+    return submitResult;
 }
 
 async function processPayments() {
@@ -127,11 +145,16 @@ async function processPayments() {
             const payment = payments[i];
             id++;
             await generateMetadata(id, 1000000); // testing only
-            const result = buildTx(payment.tx_hash, payment.output_index, payment.user_wallet, id);
-
-            if (result.err) {
+            const buildResult = buildTx(payment.tx_hash, payment.output_index, payment.user_wallet, id);
+            if (buildResult.err) {
                 id--; // minting failed, rollback
-                throw result.err;
+                throw buildResult.err;
+            }
+            
+            const signResult = signTx(id);
+            if (signResult.err) {
+                id--; // minting failed, rollback
+                throw signResult.err;
             }
         }
     } catch (err) {

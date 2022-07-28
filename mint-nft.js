@@ -1,4 +1,3 @@
-
 import * as fs from 'fs';
 import cmd from 'node-cmd';
 
@@ -17,7 +16,6 @@ const script = "state/policy.script";
 const outFile = "matx.raw";
 
 const tokenNameHex = Buffer.from(tokenName).toString('hex');
-
 
 console.log('tokenNameHex', tokenNameHex);
 
